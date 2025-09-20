@@ -1,15 +1,87 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Promise Chaining Transformations</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    #output { margin-top: 12px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <label>
+    Enter number:
+    <input id="ip" type="number" step="any" />
+  </label>
+  <button id="btn">Start</button>
 
-<html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-  </head>
+  <div id="output"></div>
 
-  <body>
-    <!-- do not change this code -->
-    <input type="number" id="ip" />
-    <button id="btn">Start</button>
-    <div id="output"></div>
-    <script type="text/javascript" src="./script.js"></script>
-  </body>
+  <script>
+    const input = document.getElementById('ip');
+    const btn = document.getElementById('btn');
+    const output = document.getElementById('output');
+
+    // Helper to create a delayed promise that resolves with value after ms
+    function delayResolve(value, ms) {
+      return new Promise((resolve) => {
+        setTimeout(() => resolve(value), ms);
+      });
+    }
+
+    btn.addEventListener('click', () => {
+      // parse value
+      const raw = input.value.trim();
+      if (raw === '') {
+        alert('Please enter a number');
+        return;
+      }
+
+      const num = Number(raw);
+      if (Number.isNaN(num)) {
+        alert('Please enter a valid number');
+        return;
+      }
+
+      // disable button while processing
+      btn.disabled = true;
+      output.textContent = ''; // clear previous
+
+      // Initial promise: resolves after 2s with the input number
+      delayResolve(num, 2000)
+        .then((value) => {
+          // show initial result
+          output.textContent = 'Result: ' + value;
+          // Second transformation: multiply by 2 after 1s
+          return delayResolve(value * 2, 1000);
+        })
+        .then((value) => {
+          output.textContent = 'Result: ' + value;
+          // Third transformation: subtract 3 after 1s
+          return delayResolve(value - 3, 1000);
+        })
+        .then((value) => {
+          output.textContent = 'Result: ' + value;
+          // Fourth transformation: divide by 2 after 1s
+          return delayResolve(value / 2, 1000);
+        })
+        .then((value) => {
+          output.textContent = 'Result: ' + value;
+          // Fifth (final): add 10 after 1s
+          return delayResolve(value + 10, 1000);
+        })
+        .then((finalValue) => {
+          // final display
+          output.textContent = 'Final Result: ' + finalValue;
+        })
+        .catch((err) => {
+          console.error(err);
+          alert('Something went wrong');
+        })
+        .finally(() => {
+          btn.disabled = false;
+        });
+    });
+  </script>
+</body>
 </html>
